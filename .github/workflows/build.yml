@@ -1,0 +1,54 @@
+name: Travelin Chat build
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout travelin-chat code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 19
+        uses: actions/setup-java@v3
+        with:
+          java-version: '19'
+          distribution: 'corretto'
+          cache: maven
+
+      - name: Build with Maven
+        run: mvn -B package -DskipTests --file pom.xml
+
+  trigger_build:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Create image tag
+        run: echo "IMAGE_TAG=$(date +%s)" >> $GITHUB_ENV
+
+      - name: Trigger Travelin Chat Docker Build
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.PAT }}
+          repository: madvelin/travelin-workflows
+          event-type: travelin-chat-push
+          client-payload: '{"tag": "c_${{ env.IMAGE_TAG }}", "ref": "master" }'
+
+  trigger_build_pr:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Trigger Travelin Chat Docker Build
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.PAT }}
+          repository: madvelin/travelin-workflows
+          event-type: travelin-chat-push
+          client-payload: '{"tag": "c_pr_${{ github.event.pull_request.number }}", "ref": "${{ github.event.pull_request.head.ref }}" }'
