@@ -7,7 +7,7 @@ package com.travelin.travelinchat.enums;
 
 public enum ChatActions {
     JOIN("Join"),
-    SEND_MESSAGE("Send message"),
+    MESSAGE("Message"),
     LEAVE("Leave");
 
     private final String value;
