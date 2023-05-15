@@ -1,7 +1,7 @@
 package com.travelin.travelinchat.controllers.advices;
 
 import com.mongodb.MongoException;
-import com.travelin.travelinchat.controllers.UserController;
+import com.travelin.travelinchat.controllers.ChatRestController;
 import com.travelin.travelinchat.dtos.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
  * @since : 4/14/2023, Fri
  **/
 
-@ControllerAdvice(assignableTypes = UserController.class)
-public class UserControllerAdvice {
+@ControllerAdvice(assignableTypes = ChatRestController.class)
+public class ChatControllerAdvice {
 
     @ExceptionHandler(value = MongoException.class)
     public ResponseEntity<?> handleMongoException(final MongoException exception, final HttpServletRequest request) {
